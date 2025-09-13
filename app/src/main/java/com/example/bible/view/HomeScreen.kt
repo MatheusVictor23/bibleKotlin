@@ -44,6 +44,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.composables.BookPlus
+import com.composables.Crosshair
+import com.composables.Crown
+import com.composables.Flame
+import com.composables.Trophy
 
 @Composable
 fun HomeScreen(
@@ -83,7 +88,12 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.AddCircle, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
+                        Icon(
+                            imageVector = BookPlus,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
                         Spacer(Modifier.width(12.dp))
                         Column {
                             Text("Bíblia Sagrada", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
@@ -91,7 +101,7 @@ fun HomeScreen(
                         }
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Star, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(20.dp))
+                        Crown
                         Spacer(Modifier.width(4.dp))
                         Text("Nível $level", fontWeight = FontWeight.Bold, color = Color.White)
                     }
@@ -124,9 +134,27 @@ fun HomeScreen(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                StatCard(icon = Icons.Default.AddCircle, value = "$totalPoints", label = "Pontos", color = Color(0xFFFFD700))
-                StatCard(icon = Icons.Default.AddCircle, value = "$streak", label = "Sequência", color = Color.Red)
-                StatCard(icon = Icons.Default.Star, value = "$level", label = "Nível", color = MaterialTheme.colorScheme.primary)
+                StatCard(
+                    icon = Trophy,
+                    value = "$totalPoints",
+                    label = "Pontos",
+                    color = Color(0xFFFFD700),
+                    modifier = Modifier.weight(0.3f).fillMaxWidth()
+                )
+                StatCard(
+                    icon = Flame,
+                    value = "$streak",
+                    label = "Sequência",
+                    color = Color.Red,
+                    modifier = Modifier.weight(0.3f).fillMaxWidth()
+                )
+                StatCard(
+                    icon = Crown,
+                    value = "$level",
+                    label = "Nível",
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(0.3f).fillMaxWidth()
+                )
             }
 
             // Quick Actions
@@ -163,7 +191,7 @@ fun HomeScreen(
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Icon(Icons.Default.AddCircle, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Crosshair
                             Spacer(Modifier.width(6.dp))
                             Text("Missões")
                         }
@@ -178,7 +206,12 @@ fun HomeScreen(
             ) {
                 Column(Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.AddCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Icon(
+                            imageVector = Crosshair,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
                         Spacer(Modifier.width(8.dp))
                         Text("Missão de Hoje", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     }
@@ -186,7 +219,7 @@ fun HomeScreen(
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column {
                             Text("Leitor Diário", fontWeight = FontWeight.Medium)
-                            Text("Leia pelo menos 1 versículo hoje", fontSize = 12.sp, color = Color.Gray)
+                            Text("Leia pelo menos 1 Capítulo hoje", fontSize = 12.sp, color = Color.Gray)
                         }
                         AssistChip(
                             onClick = { },
@@ -211,7 +244,8 @@ fun HomeScreen(
                     Spacer(Modifier.height(12.dp))
                     Text(
                         "\"Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.\"",
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                        modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(Modifier.height(8.dp))
                     Text("João 3:16", fontSize = 12.sp, color = Color.Gray)
@@ -222,13 +256,22 @@ fun HomeScreen(
 }
 
 @Composable
-fun StatCard(icon: androidx.compose.ui.graphics.vector.ImageVector, value: String, label: String, color: Color) {
+fun StatCard(
+    icon: ImageVector,
+    value: String,
+    label: String,
+    color: Color,
+    modifier: Modifier = Modifier
+) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        modifier = modifier
     ) {
         Column(
-            Modifier.padding(12.dp),
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth(), // garante que o conteúdo do Column ocupe o card inteiro
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(28.dp))
