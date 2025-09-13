@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,6 +23,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -32,29 +33,34 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.bible.viewModel.ReaderViewModel
 
 
 @Composable
-fun ReaderScreen() {
+fun ReaderScreen(viewModel: ReaderViewModel) {
     val selectedBook = "Gênesis"
     val selectedChapter = 1
-    val verses = listOf(
-        "No princípio, criou Deus os céus e a terra.",
-        "E a terra era sem forma e vazia; e havia trevas sobre a face do abismo; e o Espírito de Deus se movia sobre a face das águas.",
-        "E disse Deus: Haja luz; e houve luz.",
-        "E viu Deus que era boa a luz; e fez Deus separação entre a luz e as trevas.",
-        "E Deus chamou à luz Dia; e às trevas chamou Noite. E foi a tarde e a manhã, o dia primeiro.",
-        "No princípio, criou Deus os céus e a terra.",
-        "E a terra era sem forma e vazia; e havia trevas sobre a face do abismo; e o Espírito de Deus se movia sobre a face das águas.",
-        "E disse Deus: Haja luz; e houve luz.",
-        "E viu Deus que era boa a luz; e fez Deus separação entre a luz e as trevas.",
-        "E Deus chamou à luz Dia; e às trevas chamou Noite. E foi a tarde e a manhã, o dia primeiro.",
-        "No princípio, criou Deus os céus e a terra.",
-        "E a terra era sem forma e vazia; e havia trevas sobre a face do abismo; e o Espírito de Deus se movia sobre a face das águas.",
-        "E disse Deus: Haja luz; e houve luz.",
-        "E viu Deus que era boa a luz; e fez Deus separação entre a luz e as trevas.",
-        "E Deus chamou à luz Dia; e às trevas chamou Noite. E foi a tarde e a manhã, o dia primeiro."
-    )
+
+    val verses by viewModel.verses.collectAsState()
+
+
+//    val verses = listOf(
+//        "No princípio, criou Deus os céus e a terra.",
+//        "E a terra era sem forma e vazia; e havia trevas sobre a face do abismo; e o Espírito de Deus se movia sobre a face das águas.",
+//        "E disse Deus: Haja luz; e houve luz.",
+//        "E viu Deus que era boa a luz; e fez Deus separação entre a luz e as trevas.",
+//        "E Deus chamou à luz Dia; e às trevas chamou Noite. E foi a tarde e a manhã, o dia primeiro.",
+//        "No princípio, criou Deus os céus e a terra.",
+//        "E a terra era sem forma e vazia; e havia trevas sobre a face do abismo; e o Espírito de Deus se movia sobre a face das águas.",
+//        "E disse Deus: Haja luz; e houve luz.",
+//        "E viu Deus que era boa a luz; e fez Deus separação entre a luz e as trevas.",
+//        "E Deus chamou à luz Dia; e às trevas chamou Noite. E foi a tarde e a manhã, o dia primeiro.",
+//        "No princípio, criou Deus os céus e a terra.",
+//        "E a terra era sem forma e vazia; e havia trevas sobre a face do abismo; e o Espírito de Deus se movia sobre a face das águas.",
+//        "E disse Deus: Haja luz; e houve luz.",
+//        "E viu Deus que era boa a luz; e fez Deus separação entre a luz e as trevas.",
+//        "E Deus chamou à luz Dia; e às trevas chamou Noite. E foi a tarde e a manhã, o dia primeiro."
+//    )
 
     Column(
         modifier = Modifier
@@ -166,19 +172,64 @@ fun ReaderScreen() {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Verses
+//        LazyColumn(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(horizontal = 16.dp),
+//            verticalArrangement = Arrangement.spacedBy(0.dp) // sem espaço, pois já terá bordas
+//        ) {
+//            itemsIndexed(verses) { index, verse ->
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(vertical = 8.dp) // espaço interno acima e abaixo do texto
+//                        .drawBehind {
+//                            // Borda inferior (se não for o último)
+//                            if (index < verses.lastIndex) {
+//                                drawLine(
+//                                    color = Color.LightGray,
+//                                    start = Offset(0f, size.height),
+//                                    end = Offset(size.width, size.height),
+//                                    strokeWidth = 2f
+//                                )
+//                            }
+//                        },
+//                    verticalAlignment = Alignment.Top
+//                ) {
+//                    // Número do versículo
+//                    Text(
+//                        text = "${index + 1} ",
+//                        fontWeight = FontWeight.Bold,
+//                        style = MaterialTheme.typography.bodyLarge
+//                    )
+//                    // Texto do versículo
+//                    Text(
+//                        text = verse,
+//                        style = MaterialTheme.typography.bodyLarge,
+//                        modifier = Modifier.padding(bottom = 4.dp) // distância entre texto e borda
+//                    )
+//                }
+//            }
+//
+//            // Adiciona um padding no final da lista
+//            item {
+//                Spacer(modifier = Modifier.height(32.dp))
+//            }
+//        }
+
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(0.dp) // sem espaço, pois já terá bordas
+            verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
             itemsIndexed(verses) { index, verse ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp) // espaço interno acima e abaixo do texto
+                        .padding(vertical = 8.dp)
                         .drawBehind {
-                            // Borda inferior (se não for o último)
                             if (index < verses.lastIndex) {
                                 drawLine(
                                     color = Color.LightGray,
@@ -190,25 +241,19 @@ fun ReaderScreen() {
                         },
                     verticalAlignment = Alignment.Top
                 ) {
-                    // Número do versículo
                     Text(
-                        text = "${index + 1} ",
+                        text = "${verse.number} ",
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.bodyLarge
                     )
-                    // Texto do versículo
                     Text(
-                        text = verse,
+                        text = verse.text,
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(bottom = 4.dp) // distância entre texto e borda
+                        modifier = Modifier.padding(bottom = 4.dp)
                     )
                 }
             }
-
-            // Adiciona um padding no final da lista
-            item {
-                Spacer(modifier = Modifier.height(32.dp))
-            }
+            item { Spacer(modifier = Modifier.height(32.dp)) }
         }
     }
 }

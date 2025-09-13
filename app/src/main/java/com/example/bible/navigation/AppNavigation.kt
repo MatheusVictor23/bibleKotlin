@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.bible.components.BottomNavigationBar
 import com.example.bible.view.HomeScreen
 import com.example.bible.view.ReaderScreen
+import com.example.bible.viewModel.ReaderViewModel
 
 
 sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
@@ -35,7 +36,7 @@ val bottomNavItems = listOf(
 
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(viewModel: ReaderViewModel) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -57,7 +58,7 @@ fun AppNavigation() {
                 streak = 5,
                 navController = navController
             ) }
-            composable(Screen.Reader.route) { ReaderScreen() }
+            composable(Screen.Reader.route) { ReaderScreen(viewModel) }
             composable(Screen.Favorites.route) { FavoritesScreen() }
             composable(Screen.Missions.route) { MissionsScreen() }
         }
