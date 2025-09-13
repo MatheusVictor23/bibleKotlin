@@ -11,6 +11,20 @@ import kotlinx.coroutines.launch
 
 class ReaderViewModel(private val repository: BibleRepository): ViewModel() {
 
+    private val _selectedBook = MutableStateFlow("Gênesis")
+    val selectedBook: StateFlow<String> = _selectedBook
+
+    private val _selectedChapter = MutableStateFlow(1)
+    val selectedChapter: StateFlow<Int> = _selectedChapter
+
+    fun setBook(book: String) {
+        _selectedBook.value = book
+    }
+
+    fun setChapter(chapter: Int) {
+        _selectedChapter.value = chapter
+    }
+
     private val _books = MutableStateFlow<List<BookEntity>>(emptyList())
     val books: StateFlow<List<BookEntity>> = _books
 
