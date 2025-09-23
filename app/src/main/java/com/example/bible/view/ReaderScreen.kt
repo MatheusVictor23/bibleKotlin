@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -42,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -50,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.composables.BookPlus
+import com.example.bible.database.VerseEntity
 import com.example.bible.viewModel.ReaderViewModel
 
 
@@ -65,6 +68,11 @@ fun ReaderScreen(viewModel: ReaderViewModel) {
 
     var showBookDialog by remember { mutableStateOf(false) }
     var showChapterDialog by remember { mutableStateOf(false) }
+
+    var showMarkDialog by remember { mutableStateOf(false) }
+
+    var selectedVerses by remember { mutableStateOf<List<VerseEntity>>(emptyList()) }
+    var verseHighlights by remember { mutableStateOf<Map<Int, Color>>(emptyMap()) }
 
 
     Column(
@@ -140,7 +148,7 @@ fun ReaderScreen(viewModel: ReaderViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Chapter navigation
+        // Navegacao de capitulos
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -186,16 +194,21 @@ fun ReaderScreen(viewModel: ReaderViewModel) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .drawBehind {
-                            if (index < verses.lastIndex) {
-                                drawLine(
-                                    color = Color.LightGray,
-                                    start = Offset(0f, size.height),
-                                    end = Offset(size.width, size.height),
-                                    strokeWidth = 2f
-                                )
+                        .background(
+                            when {
+                                verseHighlights.containsKey(verse.id) -> verseHighlights[verse.id]!!
+                                selectedVerses.contains(verse) -> Color.LightGray.copy(alpha = 0.3f) // pré-seleção
+                                else -> Color.Transparent
                             }
+                        )
+                        .padding(vertical = 8.dp)
+                        .clickable {
+                            selectedVerses = if (selectedVerses.contains(verse)) {
+                                selectedVerses - verse
+                            } else {
+                                selectedVerses + verse
+                            }
+                            showMarkDialog = true
                         },
                     verticalAlignment = Alignment.Top
                 ) {
@@ -207,14 +220,14 @@ fun ReaderScreen(viewModel: ReaderViewModel) {
                     Text(
                         text = verse.text,
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(bottom = 4.dp)
+                        modifier = Modifier.padding(bottom = 4.dp),
                     )
                 }
             }
             item { Spacer(modifier = Modifier.height(32.dp)) }
         }
 
-        // Diálogo de Livros
+        // Lista de Livros
         if (showBookDialog) {
             AlertDialog(
                 onDismissRequest = { showBookDialog = false },
@@ -229,6 +242,7 @@ fun ReaderScreen(viewModel: ReaderViewModel) {
                                         .fillMaxWidth()
                                         .clickable {
                                             viewModel.setBook(book)
+                                            viewModel.setChapter(selectedChapter ?: chapters[0])
                                             showBookDialog = false
                                         }
                                         .padding(12.dp)
@@ -241,7 +255,7 @@ fun ReaderScreen(viewModel: ReaderViewModel) {
             )
         }
 
-        // Diálogo de Capítulos
+        // Lista de Capítulos
         if (showChapterDialog) {
             AlertDialog(
                 onDismissRequest = { showChapterDialog = false },
@@ -261,6 +275,36 @@ fun ReaderScreen(viewModel: ReaderViewModel) {
                                         .padding(12.dp)
                                 )
                             }
+                        }
+                    }
+                },
+                confirmButton = {}
+            )
+        }
+
+        if (showMarkDialog && selectedVerses.isNotEmpty()) {
+            AlertDialog(
+                onDismissRequest = {
+                    showMarkDialog = false
+                    selectedVerses = emptyList() // limpa seleção ao cancelar
+                },
+                title = { Text("Selecionar cor de marcação") },
+                text = {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf(Color.Yellow, Color.Green, Color.Cyan, Color.Red).forEach { color ->
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(color)
+                                    .clickable {
+                                        // aplica a cor em todos os selecionados
+                                        verseHighlights = verseHighlights +
+                                                selectedVerses.associate { it.id to color }
+                                        showMarkDialog = false
+                                        selectedVerses = emptyList()
+                                    }
+                            )
                         }
                     }
                 },

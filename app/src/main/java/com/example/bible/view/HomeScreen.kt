@@ -130,32 +130,32 @@ fun HomeScreen(
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
             // Stats Cards
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                StatCard(
-                    icon = Trophy,
-                    value = "$totalPoints",
-                    label = "Pontos",
-                    color = Color(0xFFFFD700),
-                    modifier = Modifier.weight(0.3f).fillMaxWidth()
-                )
-                StatCard(
-                    icon = Flame,
-                    value = "$streak",
-                    label = "Sequência",
-                    color = Color.Red,
-                    modifier = Modifier.weight(0.3f).fillMaxWidth()
-                )
-                StatCard(
-                    icon = Crown,
-                    value = "$level",
-                    label = "Nível",
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(0.3f).fillMaxWidth()
-                )
-            }
+//            Row(
+//                Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.spacedBy(12.dp)
+//            ) {
+//                StatCard(
+//                    icon = Trophy,
+//                    value = "$totalPoints",
+//                    label = "Pontos",
+//                    color = Color(0xFFFFD700),
+//                    modifier = Modifier.weight(0.3f).fillMaxWidth()
+//                )
+//                StatCard(
+//                    icon = Flame,
+//                    value = "$streak",
+//                    label = "Sequência",
+//                    color = Color.Red,
+//                    modifier = Modifier.weight(0.3f).fillMaxWidth()
+//                )
+//                StatCard(
+//                    icon = Crown,
+//                    value = "$level",
+//                    label = "Nível",
+//                    color = MaterialTheme.colorScheme.primary,
+//                    modifier = Modifier.weight(0.3f).fillMaxWidth()
+//                )
+//            }
 
             // Quick Actions
             Card {
@@ -178,7 +178,14 @@ fun HomeScreen(
                     Spacer(Modifier.height(12.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         OutlinedButton(
-                            onClick = { println("Click") },
+                            onClick = {
+                                navController.navigate("favorites") {
+                                    // Evita empilhar várias instâncias da mesma tela
+                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp)
                         ) {
@@ -187,7 +194,14 @@ fun HomeScreen(
                             Text("Favoritos")
                         }
                         OutlinedButton(
-                            onClick = { println("Click") },
+                            onClick = {
+                                navController.navigate("missions") {
+                                    // Evita empilhar várias instâncias da mesma tela
+                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp)
                         ) {
@@ -223,7 +237,7 @@ fun HomeScreen(
                         }
                         AssistChip(
                             onClick = { },
-                            label = { Text("+5 pontos", color = Color(0xFFFFA000)) },
+                            label = { Text("+50 pontos", color = Color(0xFFFFA000)) },
                             colors = AssistChipDefaults.assistChipColors(containerColor = Color(0xFFFFF3CD))
                         )
                     }
@@ -243,12 +257,12 @@ fun HomeScreen(
                     }
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        "\"Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.\"",
+                        "\"Jesus chorou.\"",
                         fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(Modifier.height(8.dp))
-                    Text("João 3:16", fontSize = 12.sp, color = Color.Gray)
+                    Text("João 11:35", fontSize = 12.sp, color = Color.Gray)
                 }
             }
         }

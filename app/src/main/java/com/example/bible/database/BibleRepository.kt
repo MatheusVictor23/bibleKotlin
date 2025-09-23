@@ -1,6 +1,7 @@
 package com.example.bible.database
 
 import android.content.Context
+import com.example.bible.MainActivity
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -32,4 +33,9 @@ class BibleRepository(private val dao: BibleDao, private val context: Context) {
     suspend fun getBooks() = dao.getAllBooks()
     suspend fun getChapters(bookId: Int) = dao.getChaptersByBook(bookId)
     suspend fun getVerses(bookId: Int, chapterNumber: Int) = dao.getVersesByBookAndChapter(bookId, chapterNumber)
+
+    suspend fun getLastLecture() = dao.getLastChapter()
+
+    suspend fun saveLastLecture(bookId: Int, chapterNumber: Int) = dao.saveLastChapter(LastChapterEntity(bookId = bookId, chapterNumber = chapterNumber))
+
 }

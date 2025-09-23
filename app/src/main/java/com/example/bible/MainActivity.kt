@@ -4,13 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,7 +12,6 @@ import com.example.bible.database.BibleDatabase
 import com.example.bible.database.BibleRepository
 import com.example.bible.navigation.AppNavigation
 import com.example.bible.ui.theme.BibleTheme
-import com.example.bible.view.HomeScreen
 import com.example.bible.viewModel.ReaderViewModel
 
 class MainActivity : ComponentActivity() {
@@ -45,6 +37,8 @@ class MainActivity : ComponentActivity() {
                 throw IllegalArgumentException("Unknown ViewModel class")
             }
         }
+
+
 
         setContent {
             BibleTheme {
