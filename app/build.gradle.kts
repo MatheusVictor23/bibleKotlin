@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("plugin.serialization") version "2.2.20"
     id("com.google.devtools.ksp")
 }
 
@@ -38,6 +39,8 @@ android {
     buildFeatures {
         compose = true
     }
+
+
 }
 
 dependencies {
@@ -72,4 +75,12 @@ dependencies {
 
     implementation("com.google.code.gson:gson:2.13.2")
     implementation("com.composables:icons-lucide:1.0.0")
+
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.1.2") // Autenticação
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:2.1.2") // Banco (CRUD)
+    implementation("io.github.jan-tennert.supabase:realtime-kt:2.1.2")
+    implementation(platform("io.github.jan-tennert.supabase:bom:2.1.2"))
+    implementation("io.ktor:ktor-client-okhttp:2.3.4")
+
+
 }

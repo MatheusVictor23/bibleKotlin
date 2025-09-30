@@ -2,10 +2,10 @@ package com.example.bible.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bible.database.BibleRepository
-import com.example.bible.database.BookEntity
-import com.example.bible.database.ChapterEntity
-import com.example.bible.database.VerseEntity
+import com.example.bible.roomDatabase.entity.BookEntity
+import com.example.bible.roomDatabase.entity.ChapterEntity
+import com.example.bible.roomDatabase.entity.VerseEntity
+import com.example.bible.roomDatabase.repository.BibleRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

@@ -1,4 +1,4 @@
-package com.example.bible.database
+package com.example.bible.roomDatabase
 
 data class BibleJson(
     val abbrev: String,

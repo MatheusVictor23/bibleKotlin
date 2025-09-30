@@ -1,7 +1,12 @@
-package com.example.bible.database
+package com.example.bible.roomDatabase.repository
 
 import android.content.Context
-import com.example.bible.MainActivity
+import com.example.bible.roomDatabase.BibleJson
+import com.example.bible.roomDatabase.dao.BibleDao
+import com.example.bible.roomDatabase.entity.BookEntity
+import com.example.bible.roomDatabase.entity.ChapterEntity
+import com.example.bible.roomDatabase.entity.LastChapterEntity
+import com.example.bible.roomDatabase.entity.VerseEntity
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +21,9 @@ class BibleRepository(private val dao: BibleDao, private val context: Context) {
             val bibleList: List<BibleJson> = Gson().fromJson(json, type)
 
             bibleList.forEach { book ->
-                val bookId = dao.insertBooks(listOf(BookEntity(abbrev = book.abbrev, name = book.name))).first().toInt()
+                val bookId =
+                    dao.insertBooks(listOf(BookEntity(abbrev = book.abbrev, name = book.name)))
+                        .first().toInt()
                 book.chapters.forEachIndexed { chapIndex, verses ->
                     val chapterId = dao.insertChapters(
                         listOf(ChapterEntity(bookId = bookId, number = chapIndex + 1))
@@ -36,6 +43,8 @@ class BibleRepository(private val dao: BibleDao, private val context: Context) {
 
     suspend fun getLastLecture() = dao.getLastChapter()
 
-    suspend fun saveLastLecture(bookId: Int, chapterNumber: Int) = dao.saveLastChapter(LastChapterEntity(bookId = bookId, chapterNumber = chapterNumber))
+    suspend fun saveLastLecture(bookId: Int, chapterNumber: Int) = dao.saveLastChapter(
+        LastChapterEntity(bookId = bookId, chapterNumber = chapterNumber)
+    )
 
 }

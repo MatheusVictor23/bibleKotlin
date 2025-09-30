@@ -4,14 +4,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Room
-import com.example.bible.database.BibleDatabase
-import com.example.bible.database.BibleRepository
+import com.example.bible.roomDatabase.BibleDatabase
+import com.example.bible.roomDatabase.repository.BibleRepository
 import com.example.bible.navigation.AppNavigation
 import com.example.bible.ui.theme.BibleTheme
+import com.example.bible.view.AuthScreen
+import com.example.bible.viewModel.AuthViewModel
 import com.example.bible.viewModel.ReaderViewModel
 
 class MainActivity : ComponentActivity() {
@@ -24,7 +28,9 @@ class MainActivity : ComponentActivity() {
             applicationContext,
             BibleDatabase::class.java,
             "bible.db"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
 
         val repository = BibleRepository(db.bibleDao(), applicationContext)
 
@@ -42,10 +48,15 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             BibleTheme {
-                val viewModel: ReaderViewModel = viewModel(factory = factory)
+                val authViewModel: AuthViewModel = viewModel()
+                val userSession by authViewModel.userSession.collectAsState()
 
-                // 🚀 Chama a navegação
-                AppNavigation(viewModel)
+                if (userSession == null) {
+                    AuthScreen(authViewModel)
+                } else {
+                    val viewModel: ReaderViewModel = viewModel(factory = factory)
+                    AppNavigation(viewModel)
+                }
             }
         }
     }
