@@ -13,12 +13,15 @@ import androidx.room.Room
 import com.example.bible.roomDatabase.BibleDatabase
 import com.example.bible.roomDatabase.repository.BibleRepository
 import com.example.bible.navigation.AppNavigation
+import com.example.bible.navigation.LinkNavigation
 import com.example.bible.ui.theme.BibleTheme
-import com.example.bible.view.AuthScreen
+import com.example.bible.view.Auth.LoginScreen
 import com.example.bible.viewModel.AuthViewModel
 import com.example.bible.viewModel.ReaderViewModel
 
 class MainActivity : ComponentActivity() {
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -48,15 +51,18 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             BibleTheme {
-                val authViewModel: AuthViewModel = viewModel()
-                val userSession by authViewModel.userSession.collectAsState()
+               val authViewModel: AuthViewModel = viewModel()
+//                val userSession by authViewModel.userSession.collectAsState()
+//
+//                if (userSession == null) {
+//                    LinkNavigation(authViewModel)
+//                } else {
+//                    val viewModel: ReaderViewModel = viewModel(factory = factory)
+//                    AppNavigation(viewModel, authViewModel)
+//                }
 
-                if (userSession == null) {
-                    AuthScreen(authViewModel)
-                } else {
-                    val viewModel: ReaderViewModel = viewModel(factory = factory)
-                    AppNavigation(viewModel)
-                }
+                val viewModel: ReaderViewModel = viewModel(factory = factory)
+                AppNavigation(viewModel, authViewModel)
             }
         }
     }

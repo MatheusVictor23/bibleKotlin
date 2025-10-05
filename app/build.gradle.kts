@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.bible"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.cronet.embedded)
     implementation(libs.androidx.compose.runtime)
+    implementation(libs.compose.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -76,8 +77,8 @@ dependencies {
     implementation("com.google.code.gson:gson:2.13.2")
     implementation("com.composables:icons-lucide:1.0.0")
 
-    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.1.2") // Autenticação
-    implementation("io.github.jan-tennert.supabase:postgrest-kt:2.1.2") // Banco (CRUD)
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.1.2")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:2.1.2")
     implementation("io.github.jan-tennert.supabase:realtime-kt:2.1.2")
     implementation(platform("io.github.jan-tennert.supabase:bom:2.1.2"))
     implementation("io.ktor:ktor-client-okhttp:2.3.4")

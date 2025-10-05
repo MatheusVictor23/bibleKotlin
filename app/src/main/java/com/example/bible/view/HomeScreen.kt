@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,6 +50,7 @@ import com.composables.Crosshair
 import com.composables.Crown
 import com.composables.Flame
 import com.composables.Trophy
+import com.example.bible.R
 
 @Composable
 fun HomeScreen(
@@ -189,7 +191,7 @@ fun HomeScreen(
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Icon(Icons.Default.Favorite, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Icon(painter = painterResource(id = R.drawable.icon_heart), contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
                             Text("Favoritos")
                         }

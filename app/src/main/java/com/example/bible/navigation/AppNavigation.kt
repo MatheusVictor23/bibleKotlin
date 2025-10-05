@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -15,12 +14,15 @@ import com.composables.BookOpen
 import com.composables.Crosshair
 import com.composables.House
 import com.example.bible.components.BottomNavigationBar
+import com.example.bible.view.Auth.LoginScreen
+import com.example.bible.view.Auth.SignUpScreen
 import com.example.bible.view.FavoritesScreen
 import com.example.bible.view.HomeScreen
 import com.example.bible.view.Mission
 import com.example.bible.view.MissionsScreen
 import com.example.bible.view.PerfilScreen
 import com.example.bible.view.ReaderScreen
+import com.example.bible.viewModel.AuthViewModel
 import com.example.bible.viewModel.ReaderViewModel
 
 
@@ -34,6 +36,10 @@ sealed class Screen(val route: String, val label: String, val icon: ImageVector)
     object Perfil : Screen("perfil", "Perfil", Icons.Filled.Person)
 
     object Favorites : Screen("favorites", "Favoritos", Icons.Filled.Person)
+
+    object SignUp : Screen("signup", "Cadastrar", Icons.Filled.Person)
+
+    object Login : Screen("login", "Login", Icons.Filled.Person)
 
 }
 
@@ -122,7 +128,7 @@ val bottomNavItems = listOf(
 
 
 @Composable
-fun AppNavigation(viewModel: ReaderViewModel) {
+fun AppNavigation(readerViewModel: ReaderViewModel, authViewModel: AuthViewModel) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -144,7 +150,7 @@ fun AppNavigation(viewModel: ReaderViewModel) {
                 streak = 5,
                 navController = navController
             ) }
-            composable(Screen.Reader.route) { ReaderScreen(viewModel) }
+            composable(Screen.Reader.route) { ReaderScreen(readerViewModel) }
 
             composable(Screen.Missions.route) { MissionsScreen (
                 missions,
@@ -170,6 +176,26 @@ fun AppNavigation(viewModel: ReaderViewModel) {
                     totalPoints = 1520,
                     streak = 5,)
             }
+
+        }
+    }
+}
+
+@Composable
+fun LinkNavigation(authViewModel: AuthViewModel){
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "signup"){
+        composable(Screen.Login.route){
+            LoginScreen(authViewModel, signUpNavigator = {
+                navController.navigate(Screen.SignUp.route, builder = {launchSingleTop = true})
+            })
+        }
+
+        composable (Screen.SignUp.route){
+            SignUpScreen(authViewModel, loginNavigator = {
+                navController.navigate(Screen.Login.route, builder = {launchSingleTop = true})
+            })
         }
     }
 }

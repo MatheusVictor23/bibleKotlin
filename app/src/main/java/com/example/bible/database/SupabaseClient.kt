@@ -10,8 +10,8 @@ import io.github.jan.supabase.realtime.Realtime
 object SupabaseClient {
 
     val client: SupabaseClient = createSupabaseClient(
-        supabaseUrl = "https://waitnkubagmwhdkehbuo.supabase.co",
-        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhaXRua3ViYWdtd2hka2VoYnVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczNDU4NjcsImV4cCI6MjA3MjkyMTg2N30.b-H8EvHfSsg5VUlddfxMLW30Nmhy-StHdIpciH79T1s"
+        supabaseUrl = "https://amdrrdonipetqbvfvohq.supabase.co",
+        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtZHJyZG9uaXBldHFidmZ2b2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1NDU3MTcsImV4cCI6MjA3MzEyMTcxN30.ytszVctUzXkUsRPeRWx1cIbybF5a5ZbxFc4yGn6hIQQ"
     ) {
         install(Postgrest)
         install(Auth)

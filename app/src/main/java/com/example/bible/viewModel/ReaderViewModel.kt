@@ -11,18 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ReaderViewModel(private val repository: BibleRepository): ViewModel() {
-
-    //lista mutavel privada de todos os livros
-    /*
-        O prefixo _ é uma convenção em Kotlin para indicar que essa variável é de uso interno
-        (o ViewModel pode alterar, mas a UI não deve acessar ela diretamente).
-    * */
     private val _books = MutableStateFlow<List<BookEntity>>(emptyList())
-    //Versao publica e imutavel para a tela observar
-    /*
-        Aqui você está expondo o fluxo para a UI, mas somente leitura.
-        StateFlow não permite alterar o valor, apenas coletar:
-    * */
     val books: StateFlow<List<BookEntity>> = _books
 
     private val _chapters = MutableStateFlow<List<ChapterEntity>>(emptyList())
