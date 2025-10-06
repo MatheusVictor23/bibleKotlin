@@ -23,15 +23,27 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.composables.BookPlus
 import com.composables.Crown
 import com.composables.Flame
 import com.example.bible.ui.components.icons.Target
+import com.example.bible.ui.screen.auth.AuthViewModel
+import kotlinx.coroutines.launch
 
 
 @Composable
-fun PerfilScreen() {
+fun PerfilScreen(
+    authViewModel: AuthViewModel = viewModel(),
+    navController: NavController,
+) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -43,6 +55,17 @@ fun PerfilScreen() {
         AchievementsSection()
         LeaderSection()
         SettingsSection()
+        Button(
+            onClick = {
+                authViewModel.signOut()
+                navController.navigate("login")
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text("Logout")
+        }
     }
 }
 
@@ -230,8 +253,7 @@ fun AchievementItem(icon: ImageVector, title: String, description: String) {
 fun LeaderSection() {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(16.dp),
         elevation = CardDefaults.cardElevation(1.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -274,8 +296,7 @@ fun LeaderSection() {
 fun SettingsSection() {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(16.dp),
         elevation = CardDefaults.cardElevation(1.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

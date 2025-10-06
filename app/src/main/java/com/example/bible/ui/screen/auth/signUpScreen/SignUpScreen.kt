@@ -14,12 +14,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.bible.ui.components.CustomSnackBar
 import com.example.bible.ui.screen.auth.AuthViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun SignUpScreen(authViewModel: AuthViewModel = viewModel(), loginNavigator: () -> Unit) {
+fun SignUpScreen(
+        authViewModel: AuthViewModel = viewModel(),
+        navController: NavController
+    ) {
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     val emailSent by authViewModel.emailSent.collectAsState()
@@ -116,7 +120,9 @@ fun SignUpScreen(authViewModel: AuthViewModel = viewModel(), loginNavigator: () 
                 ){
                     Text("Já possui conta?")
 
-                    TextButton(onClick = { loginNavigator() }) {
+                    TextButton(onClick = {
+                        navController.navigate("login")
+                    }) {
                         Text(
                             "Login",
                             textDecoration = TextDecoration.Underline,

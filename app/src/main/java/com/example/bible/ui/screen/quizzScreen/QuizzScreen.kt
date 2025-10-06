@@ -34,6 +34,12 @@ fun QuizzScreen(
     val currentQuestion = questions[currentIndex]
 
     Column(modifier = Modifier.padding(16.dp)) {
+
+        Text(
+            text ="Quizz Bible",
+            style = MaterialTheme.typography.titleLarge
+            )
+        Spacer(modifier = Modifier.height(16.dp))
         Text("Pergunta ${currentIndex + 1} de ${questions.size}", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         Text(currentQuestion.question, style = MaterialTheme.typography.bodyLarge)

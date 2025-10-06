@@ -14,12 +14,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.bible.ui.components.CustomSnackBar
 import com.example.bible.ui.screen.auth.AuthViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(authViewModel: AuthViewModel = viewModel(), signUpNavigator: () -> Unit) {
+fun LoginScreen(
+    authViewModel: AuthViewModel = viewModel(),
+    navController: NavController,
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isValid by remember { mutableStateOf(true) }
@@ -45,16 +49,18 @@ fun LoginScreen(authViewModel: AuthViewModel = viewModel(), signUpNavigator: () 
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (userSession != null) {
-                Text("Usuário logado: ${userSession?.user?.email}")
-                Button(onClick = { authViewModel.signOut() }) {
-                    Text("Logout")
-                }
-            } else {
-
                 if(!email.isEmpty() && password.length >= 8){
                     enabled = true
                 }
+
+//                LaunchedEffect(userSession != null) {
+//                    scope.launch {
+//                        snackbarHostState.showSnackbar(
+//                            message = "Login realizado com sucesso!",
+//                            withDismissAction = true,
+//                        )
+//                    }
+//                }
 
                 OutlinedTextField(
                     value = email,
@@ -92,7 +98,9 @@ fun LoginScreen(authViewModel: AuthViewModel = viewModel(), signUpNavigator: () 
                 ){
                     Text("Não possui conta?")
 
-                    TextButton(onClick = { signUpNavigator() }) {
+                    TextButton(onClick = {
+                        navController.navigate("signup")
+                    }) {
                         Text(
                             "Cadastre-se",
                             textDecoration = TextDecoration.Underline,
@@ -114,15 +122,32 @@ fun LoginScreen(authViewModel: AuthViewModel = viewModel(), signUpNavigator: () 
                     Text("Login")
                 }
 
-                error?.let {
-                    scope.launch { snackbarHostState.showSnackbar(
-                        message = "Login e senha inválidos",
-                        withDismissAction = true,
-                    ) }
+                LaunchedEffect(error, userSession) {
+                    when {
+                        error != null -> {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = "Usuário não cadastrado!",
+                                    withDismissAction = true,
+                                )
+                            }
+                            authViewModel.resetError()
+                        }
 
-                    authViewModel.resetError()
+                        userSession != null -> {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = "Login realizado com sucesso!",
+                                    withDismissAction = true,
+                                )
+
+                                navController.navigate("perfil")
+                            }
+                        }
+                    }
                 }
-            }
+
+
         }
     }
 }

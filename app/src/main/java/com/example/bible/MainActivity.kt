@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -41,11 +43,12 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             BibleTheme {
-               val authViewModel: AuthViewModel = viewModel()
+                val authViewModel: AuthViewModel = viewModel()
+                val userSession by authViewModel.userSession.collectAsState()
 
                 val readerViewModel: ReaderViewModel = viewModel(factory = factory)
                 val quizzViewModel: QuizzViewModel = viewModel(factory = factory)
-                AppNavigation(readerViewModel, authViewModel, quizzViewModel)
+                AppNavigation(readerViewModel, authViewModel, quizzViewModel, userSession)
             }
         }
     }

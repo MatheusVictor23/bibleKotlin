@@ -28,6 +28,7 @@ import com.example.bible.ui.screen.auth.AuthViewModel
 import com.example.bible.ui.screen.readerScreen.ReaderViewModel
 import com.example.bible.R
 import com.example.bible.ui.screen.quizzScreen.QuizzViewModel
+import io.github.jan.supabase.gotrue.user.UserSession
 
 
 sealed class Screen(val route: String, val label: String?, val icon: ImageVector?) {
@@ -40,7 +41,7 @@ sealed class Screen(val route: String, val label: String?, val icon: ImageVector
 
     object Favorites : Screen("favorites", "Favoritos", Icons.Filled.FavoriteBorder)
 
-    object SignUp : Screen("signup", null, null)
+    object SignUp : Screen("signup", "Perfil", Icons.Filled.Person  )
 
     object Login : Screen("login", null, null)
 
@@ -123,12 +124,12 @@ val missions = listOf(
 
 
 @Composable
-fun AppNavigation(readerViewModel: ReaderViewModel, authViewModel: AuthViewModel, quizzViewModel: QuizzViewModel) {
+fun AppNavigation(readerViewModel: ReaderViewModel, authViewModel: AuthViewModel, quizzViewModel: QuizzViewModel, userSession: UserSession?) {
     val navController = rememberNavController()
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController = navController)
+            BottomNavigationBar(navController = navController, userSession)
         }
     ) { innerPadding ->
         NavHost(
@@ -158,7 +159,7 @@ fun AppNavigation(readerViewModel: ReaderViewModel, authViewModel: AuthViewModel
                 streak = 5,)
             }
             composable(Screen.Perfil.route){
-                PerfilScreen()
+                PerfilScreen(authViewModel, navController)
             }
 
             composable (Screen.Favorites.route){
@@ -171,26 +172,37 @@ fun AppNavigation(readerViewModel: ReaderViewModel, authViewModel: AuthViewModel
                     streak = 5,)
             }
 
+            composable(Screen.Login.route){
+                LoginScreen(authViewModel, navController)
+            }
+
+            composable (Screen.SignUp.route){
+                SignUpScreen(
+                    authViewModel,
+                    navController
+                    )
+            }
+
         }
     }
 }
 
-@Composable
-fun LinkNavigation(authViewModel: AuthViewModel){
-    val navController = rememberNavController()
-
-    NavHost(navController = navController, startDestination = "signup"){
-        composable(Screen.Login.route){
-            LoginScreen(authViewModel, signUpNavigator = {
-                navController.navigate(Screen.SignUp.route, builder = {launchSingleTop = true})
-            })
-        }
-
-        composable (Screen.SignUp.route){
-            SignUpScreen(authViewModel, loginNavigator = {
-                navController.navigate(Screen.Login.route, builder = {launchSingleTop = true})
-            })
-        }
-    }
-}
+//@Composable
+//fun LinkNavigation(authViewModel: AuthViewModel){
+//    val navController = rememberNavController()
+//
+//    NavHost(navController = navController, startDestination = "signup"){
+//        composable(Screen.Login.route){
+//            LoginScreen(authViewModel, signUpNavigator = {
+//                navController.navigate(Screen.SignUp.route, builder = {launchSingleTop = true})
+//            })
+//        }
+//
+//        composable (Screen.SignUp.route){
+//            SignUpScreen(authViewModel, loginNavigator = {
+//                navController.navigate(Screen.Login.route, builder = {launchSingleTop = true})
+//            })
+//        }
+//    }
+//}
 
