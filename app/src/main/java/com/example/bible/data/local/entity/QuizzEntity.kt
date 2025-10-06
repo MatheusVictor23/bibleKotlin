@@ -5,19 +5,23 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "chapters",
+    tableName = "quizzes",
     foreignKeys = [
         ForeignKey(
-            entity = BookEntity::class,
+            entity = ChapterEntity::class,
             parentColumns = ["id"],
-            childColumns = ["bookId"],
+            childColumns = ["chapterId"],
             onDelete = ForeignKey.CASCADE
         )
     ]
 )
-data class ChapterEntity(
+data class QuizzEntity (
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val bookId: Int,
-    val number: Int,
-    val isRead: Boolean = false
+    val chapterId: Int,
+    val question: String,
+    val optionA: String,
+    val optionB: String,
+    val optionC: String,
+    val optionD: String,
+    val correctAnswer: String
 )

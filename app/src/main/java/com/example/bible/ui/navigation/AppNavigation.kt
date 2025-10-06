@@ -27,6 +27,7 @@ import com.example.bible.ui.screen.readerScreen.ReaderScreen
 import com.example.bible.ui.screen.auth.AuthViewModel
 import com.example.bible.ui.screen.readerScreen.ReaderViewModel
 import com.example.bible.R
+import com.example.bible.ui.screen.quizzScreen.QuizzViewModel
 
 
 sealed class Screen(val route: String, val label: String?, val icon: ImageVector?) {
@@ -122,7 +123,7 @@ val missions = listOf(
 
 
 @Composable
-fun AppNavigation(readerViewModel: ReaderViewModel, authViewModel: AuthViewModel) {
+fun AppNavigation(readerViewModel: ReaderViewModel, authViewModel: AuthViewModel, quizzViewModel: QuizzViewModel) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -144,7 +145,7 @@ fun AppNavigation(readerViewModel: ReaderViewModel, authViewModel: AuthViewModel
                 streak = 5,
                 navController = navController
             ) }
-            composable(Screen.Reader.route) { ReaderScreen(readerViewModel) }
+            composable(Screen.Reader.route) { ReaderScreen(readerViewModel, quizzViewModel) }
 
             composable(Screen.Missions.route) { MissionsScreen (
                 missions,

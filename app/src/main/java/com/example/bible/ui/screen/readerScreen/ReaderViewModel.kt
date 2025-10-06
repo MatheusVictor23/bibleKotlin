@@ -99,4 +99,10 @@ class ReaderViewModel(private val repository: BibleRepository): ViewModel() {
         }
     }
 
+    fun markAsRead(chapterId: Int?) {
+        viewModelScope.launch {
+            repository.markChapterAsRead(chapterId)
+        }
+    }
+
 }

@@ -8,11 +8,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Room
+import com.example.bible.data.local.AppViewModelFactory
 import com.example.bible.data.local.BibleDatabase
 import com.example.bible.data.local.repository.BibleRepository
+import com.example.bible.data.local.repository.QuizzRepository
 import com.example.bible.ui.navigation.AppNavigation
 import com.example.bible.ui.theme.BibleTheme
 import com.example.bible.ui.screen.auth.AuthViewModel
+import com.example.bible.ui.screen.quizzScreen.QuizzViewModel
 import com.example.bible.ui.screen.readerScreen.ReaderViewModel
 
 class MainActivity : ComponentActivity() {
@@ -28,26 +31,26 @@ class MainActivity : ComponentActivity() {
             BibleDatabase::class.java,
             "bible.db"
         )
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration(true)
             .build()
 
-        val repository = BibleRepository(db.bibleDao(), applicationContext)
+        val readerRepository = BibleRepository(db.bibleDao(), applicationContext)
+        val quizzRepository = QuizzRepository(db.quizzDao())
 
-        val factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                if (modelClass.isAssignableFrom(ReaderViewModel::class.java)) {
-                    @Suppress("UNCHECKED_CAST")
-                    return ReaderViewModel(repository) as T
-                }
-                throw IllegalArgumentException("Unknown ViewModel class")
-            }
-        }
-
-
+        val factory = AppViewModelFactory(readerRepository, quizzRepository)
 
         setContent {
             BibleTheme {
                val authViewModel: AuthViewModel = viewModel()
+
+                val readerViewModel: ReaderViewModel = viewModel(factory = factory)
+                val quizzViewModel: QuizzViewModel = viewModel(factory = factory)
+                AppNavigation(readerViewModel, authViewModel, quizzViewModel)
+            }
+        }
+    }
+}
+
 //                val userSession by authViewModel.userSession.collectAsState()
 //
 //                if (userSession == null) {
@@ -56,10 +59,3 @@ class MainActivity : ComponentActivity() {
 //                    val viewModel: ReaderViewModel = viewModel(factory = factory)
 //                    AppNavigation(viewModel, authViewModel)
 //                }
-
-                val viewModel: ReaderViewModel = viewModel(factory = factory)
-                AppNavigation(viewModel, authViewModel)
-            }
-        }
-    }
-}

@@ -47,4 +47,6 @@ class BibleRepository(private val dao: BibleDao, private val context: Context) {
         LastChapterEntity(bookId = bookId, chapterNumber = chapterNumber)
     )
 
+    suspend fun markChapterAsRead(chapterId: Int?) = dao.markChapterAsRead(chapterId)
+
 }

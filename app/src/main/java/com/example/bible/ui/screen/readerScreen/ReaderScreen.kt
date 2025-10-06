@@ -1,5 +1,6 @@
 package com.example.bible.ui.screen.readerScreen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,20 +22,26 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,10 +53,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.composables.BookPlus
 import com.example.bible.data.local.entity.VerseEntity
+import com.example.bible.ui.components.CustomSnackBar
+import com.example.bible.ui.screen.quizzScreen.QuizzScreen
+import com.example.bible.ui.screen.quizzScreen.QuizzViewModel
+import kotlinx.coroutines.launch
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ReaderScreen(viewModel: ReaderViewModel) {
+fun ReaderScreen(viewModel: ReaderViewModel, quizzViewModel: QuizzViewModel) {
 
     val books by viewModel.books.collectAsState()
     val chapters by viewModel.chapters.collectAsState()
@@ -66,6 +78,11 @@ fun ReaderScreen(viewModel: ReaderViewModel) {
     var selectedVerses by remember { mutableStateOf<List<VerseEntity>>(emptyList()) }
     var verseHighlights by remember { mutableStateOf<Map<Int, Color>>(emptyMap()) }
 
+    var showQuiz by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    var isRead by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -80,228 +97,294 @@ fun ReaderScreen(viewModel: ReaderViewModel) {
                 )
             )
     ) {
-        // Header
-        Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
-            shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ){
-            Column(Modifier.padding(16.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = BookPlus,
-                        contentDescription = "Book Icon",
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(32.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Column {
-                        Text("Leitura da Bíblia",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                        Text(
-                            "${selectedBook?.name ?: ""} ${selectedChapter?.number ?: ""}",
-                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
 
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Botões de seleção
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    FilledTonalButton(
-                        onClick = { showBookDialog = true },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(selectedBook?.name ?: "Selecionar Livro")
-                        Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Livros")
-                    }
-
-                    FilledTonalButton(
-                        onClick = { showChapterDialog = true },
-                        modifier = Modifier.weight(1f),
-                        enabled = selectedBook != null
-                    ) {
-                        Text("Capítulo ${selectedChapter?.number ?: "-"}")
-                        Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Livros")
-                    }
-                }
-            }
-        }
-
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Navegacao de capitulos
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            OutlinedButton(
-                onClick = { viewModel.previousChapter() },
-                enabled = selectedChapter != null && chapters.indexOf(selectedChapter) > 0
-            ) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "Anterior")
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Anterior")
-            }
-
-            Text(
-                "${selectedBook?.name ?: ""} ${selectedChapter?.number ?: ""}",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-
-            OutlinedButton(
-                onClick = { viewModel.nextChapter() },
-                enabled = selectedChapter != null && chapters.indexOf(selectedChapter) < chapters.lastIndex
-            ) {
-                Text("Próximo")
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(Icons.Filled.ArrowForward, contentDescription = "Próximo")
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Versículos
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(0.dp)
-        ) {
-            itemsIndexed(verses) { index, verse ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            when {
-                                verseHighlights.containsKey(verse.id) -> verseHighlights[verse.id]!!
-                                selectedVerses.contains(verse) -> Color.LightGray.copy(alpha = 0.3f) // pré-seleção
-                                else -> Color.Transparent
-                            }
-                        )
-                        .padding(vertical = 8.dp)
-                        .clickable {
-                            selectedVerses = if (selectedVerses.contains(verse)) {
-                                selectedVerses - verse
-                            } else {
-                                selectedVerses + verse
-                            }
-                            showMarkDialog = true
-                        },
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Text(
-                        text = "${verse.number} ",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Text(
-                        text = verse.text,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(bottom = 4.dp),
-                    )
-                }
-            }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
-        }
-
-        // Lista de Livros
-        if (showBookDialog) {
-            AlertDialog(
-                onDismissRequest = { showBookDialog = false },
-                title = { Text("Selecione o livro") },
-                text = {
-                    Box(Modifier.height(300.dp).width(300.dp)) {
-                        LazyColumn {
-                            items(books) { book ->
-                                Text(
-                                    text = book.name,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            viewModel.setBook(book)
-                                            viewModel.setChapter(selectedChapter ?: chapters[0])
-                                            showBookDialog = false
-                                        }
-                                        .padding(12.dp)
-                                )
-                            }
+        if (showQuiz) {
+            QuizzScreen(
+                chapterId = selectedChapter?.id ?: 0,
+                quizzViewModel = quizzViewModel,
+                onFinish = { passed ->
+                    showQuiz = false
+                    if (passed) {
+                        isRead = true
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                "Parabéns! Capítulo marcado como lido 🎉"
+                            )
                         }
-                    }
-                },
-                confirmButton = {}
-            )
-        }
-
-        // Lista de Capítulos
-        if (showChapterDialog) {
-            AlertDialog(
-                onDismissRequest = { showChapterDialog = false },
-                title = { Text("Selecione o capítulo") },
-                text = {
-                    Box(Modifier.height(300.dp).width(250.dp)) {
-                        LazyColumn {
-                            items(chapters) { cap ->
-                                Text(
-                                    text = "Capítulo ${cap.number}",
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            viewModel.setChapter(cap)
-                                            showChapterDialog = false
-                                        }
-                                        .padding(12.dp)
-                                )
-                            }
-                        }
-                    }
-                },
-                confirmButton = {}
-            )
-        }
-
-        if (showMarkDialog && selectedVerses.isNotEmpty()) {
-            AlertDialog(
-                onDismissRequest = {
-                    showMarkDialog = false
-                    selectedVerses = emptyList() // limpa seleção ao cancelar
-                },
-                title = { Text("Selecionar cor de marcação") },
-                text = {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        listOf(Color.Yellow, Color.Green, Color.Cyan, Color.Red).forEach { color ->
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(color)
-                                    .clickable {
-                                        // aplica a cor em todos os selecionados
-                                        verseHighlights = verseHighlights +
-                                                selectedVerses.associate { it.id to color }
-                                        showMarkDialog = false
-                                        selectedVerses = emptyList()
-                                    }
+                    } else {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                "Você precisa acertar pelo menos 3 respostas!"
                             )
                         }
                     }
-                },
-                confirmButton = {}
+                }
             )
-        }
+        } else {
+
+            Scaffold(
+                snackbarHost = { CustomSnackBar(snackbarHostState, textColor = Color.Black, null) }
+            ){
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
+                        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        Column(Modifier.padding(16.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = BookPlus,
+                                    contentDescription = "Book Icon",
+                                    tint = MaterialTheme.colorScheme.onPrimary,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text("Leitura da Bíblia",
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                    Text(
+                                        "${selectedBook?.name ?: ""} ${selectedChapter?.number ?: ""}",
+                                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // Botões de seleção
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                FilledTonalButton(
+                                    onClick = { showBookDialog = true },
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text(selectedBook?.name ?: "Selecionar Livro")
+                                    Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Livros")
+                                }
+
+                                FilledTonalButton(
+                                    onClick = { showChapterDialog = true },
+                                    modifier = Modifier.weight(1f),
+                                    enabled = selectedBook != null
+                                ) {
+                                    Text("Capítulo ${selectedChapter?.number ?: "-"}")
+                                    Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Livros")
+                                }
+                            }
+                        }
+                    }
+
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Navegacao de capitulos
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedButton(
+                            onClick = { viewModel.previousChapter() },
+                            enabled = selectedChapter != null && chapters.indexOf(selectedChapter) > 0
+                        ) {
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Anterior")
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Anterior")
+                        }
+
+                        Text(
+                            "${selectedBook?.name ?: ""} ${selectedChapter?.number ?: ""}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+
+                        OutlinedButton(
+                            onClick = { viewModel.nextChapter() },
+                            enabled = selectedChapter != null && chapters.indexOf(selectedChapter) < chapters.lastIndex
+                        ) {
+                            Text("Próximo")
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Icon(Icons.Filled.ArrowForward, contentDescription = "Próximo")
+                        }
+                    }
+
+                    // Versículos
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(0.dp)
+                    ) {
+                        itemsIndexed(verses) { index, verse ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        when {
+                                            verseHighlights.containsKey(verse.id) -> verseHighlights[verse.id]!!
+                                            selectedVerses.contains(verse) -> Color.LightGray.copy(
+                                                alpha = 0.3f
+                                            )
+
+                                            else -> Color.Transparent
+                                        }
+                                    )
+                                    .padding(vertical = 8.dp)
+                                    .clickable {
+                                        selectedVerses = if (selectedVerses.contains(verse)) {
+                                            selectedVerses - verse
+                                        } else {
+                                            selectedVerses + verse
+                                        }
+                                        showMarkDialog = true
+                                    },
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Text(
+                                    text = "${verse.number} ",
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                                Text(
+                                    text = verse.text,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.padding(bottom = 4.dp),
+                                )
+                            }
+                        }
+
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = { showQuiz = true },
+                                enabled = !isRead,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                if(isRead) {
+                                    Text("Capítulo lido")
+                                }else{
+                                    Text("Marcar como lido")
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                    }
+
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+
+                    SnackbarHost(hostState = snackbarHostState)
+
+                    // Lista de Livros
+                    if (showBookDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showBookDialog = false },
+                            title = { Text("Selecione o livro") },
+                            text = {
+                                Box(Modifier
+                                    .height(300.dp)
+                                    .width(300.dp)) {
+                                    LazyColumn {
+                                        items(books) { book ->
+                                            Text(
+                                                text = book.name,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .clickable {
+                                                        viewModel.setBook(book)
+                                                        viewModel.setChapter(
+                                                            selectedChapter ?: chapters[0]
+                                                        )
+                                                        showBookDialog = false
+                                                    }
+                                                    .padding(12.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            },
+                            confirmButton = {}
+                        )
+                    }
+
+                    // Lista de Capítulos
+                    if (showChapterDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showChapterDialog = false },
+                            title = { Text("Selecione o capítulo") },
+                            text = {
+                                Box(Modifier
+                                    .height(300.dp)
+                                    .width(250.dp)) {
+                                    LazyColumn {
+                                        items(chapters) { cap ->
+                                            Text(
+                                                text = "Capítulo ${cap.number}",
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .clickable {
+                                                        viewModel.setChapter(cap)
+                                                        showChapterDialog = false
+                                                    }
+                                                    .padding(12.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            },
+                            confirmButton = {}
+                        )
+                    }
+
+                    if (showMarkDialog && selectedVerses.isNotEmpty()) {
+                        AlertDialog(
+                            onDismissRequest = {
+                                showMarkDialog = false
+                                selectedVerses = emptyList()
+                            },
+                            title = { Text("Marcar versículo") },
+                            text = {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+                                ) {
+                                    listOf(Color.Yellow, Color.Green, Color.Cyan, Color.Red, Color.Magenta, Color.LightGray).forEach { color ->
+                                        Box(
+                                            modifier = Modifier
+                                                .size(30.dp)
+                                                .clip(CircleShape)
+                                                .background(color)
+                                                .clickable {
+                                                    verseHighlights = verseHighlights +
+                                                            selectedVerses.associate { it.id to color }
+                                                    showMarkDialog = false
+                                                    selectedVerses = emptyList()
+                                                }
+                                        )
+                                    }
+                                }
+                            },
+                            confirmButton = {}
+                        )
+                    }
+                }
+            }
+
+          }
     }
 }
