@@ -7,12 +7,15 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.bible.data.local.dao.BibleDao
 import com.example.bible.data.local.dao.QuizzDao
+import com.example.bible.data.local.dao.VerseHighlightDao
 import com.example.bible.data.local.entity.BookEntity
 import com.example.bible.data.local.entity.ChapterEntity
 import com.example.bible.data.local.entity.DailyVerseEntity
 import com.example.bible.data.local.entity.LastChapterEntity
 import com.example.bible.data.local.entity.QuizzEntity
 import com.example.bible.data.local.entity.VerseEntity
+import com.example.bible.data.local.entity.FavoriteVerseEntity
+import com.example.bible.data.local.entity.VerseHighlightEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,15 +27,19 @@ import kotlinx.coroutines.launch
         VerseEntity::class,
         LastChapterEntity::class,
         DailyVerseEntity::class,
-        QuizzEntity::class
+        QuizzEntity::class,
+        FavoriteVerseEntity::class,
+        VerseHighlightEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 
     )
 abstract class BibleDatabase : RoomDatabase() {
     abstract fun bibleDao(): BibleDao
     abstract fun quizzDao(): QuizzDao
+
+    abstract fun verseHighlightDao(): VerseHighlightDao
 
     companion object {
         @Volatile private var INSTANCE: BibleDatabase? = null

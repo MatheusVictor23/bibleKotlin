@@ -34,10 +34,11 @@ fun LoginScreen(
     val error by authViewModel.error.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
+    var snackbarColor by remember { mutableStateOf(Color(0xFF4CAF50)) }
     val scope = rememberCoroutineScope()
 
     Scaffold (
-        snackbarHost = { CustomSnackBar(snackbarHostState, textColor = Color.Red, icon = Icons.Filled.Info) }
+        snackbarHost = { CustomSnackBar(snackbarHostState, backgroundColor = snackbarColor, textColor = Color.White, icon = Icons.Filled.Info) }
     ){ innerPadding ->
         Column(
             modifier = Modifier
@@ -52,15 +53,6 @@ fun LoginScreen(
                 if(!email.isEmpty() && password.length >= 8){
                     enabled = true
                 }
-
-//                LaunchedEffect(userSession != null) {
-//                    scope.launch {
-//                        snackbarHostState.showSnackbar(
-//                            message = "Login realizado com sucesso!",
-//                            withDismissAction = true,
-//                        )
-//                    }
-//                }
 
                 OutlinedTextField(
                     value = email,
@@ -126,6 +118,7 @@ fun LoginScreen(
                     when {
                         error != null -> {
                             scope.launch {
+                                snackbarColor = Color(0xFFF44336)
                                 snackbarHostState.showSnackbar(
                                     message = "Usuário não cadastrado!",
                                     withDismissAction = true,
@@ -136,6 +129,7 @@ fun LoginScreen(
 
                         userSession != null -> {
                             scope.launch {
+                                snackbarColor = Color(0xFF4CAF50)
                                 snackbarHostState.showSnackbar(
                                     message = "Login realizado com sucesso!",
                                     withDismissAction = true,

@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -61,7 +62,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ReaderScreen(viewModel: ReaderViewModel, quizzViewModel: QuizzViewModel) {
+fun ReaderScreen(viewModel: ReaderViewModel, quizzViewModel: QuizzViewModel, highlightViewModel: VerseHighlightViewModel) {
 
     val books by viewModel.books.collectAsState()
     val chapters by viewModel.chapters.collectAsState()
@@ -73,13 +74,14 @@ fun ReaderScreen(viewModel: ReaderViewModel, quizzViewModel: QuizzViewModel) {
     var showBookDialog by remember { mutableStateOf(false) }
     var showChapterDialog by remember { mutableStateOf(false) }
 
-    var showMarkDialog by remember { mutableStateOf(false) }
+    val verseHighlights by highlightViewModel.highlights.collectAsState()
 
+    var showMarkDialog by remember { mutableStateOf(false) }
     var selectedVerses by remember { mutableStateOf<List<VerseEntity>>(emptyList()) }
-    var verseHighlights by remember { mutableStateOf<Map<Int, Color>>(emptyMap()) }
 
     var showQuiz by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    var snackbarColor by remember { mutableStateOf(Color(0xFF4CAF50)) }
     val scope = rememberCoroutineScope()
 
     var isRead by remember { mutableStateOf(false) }
@@ -104,17 +106,16 @@ fun ReaderScreen(viewModel: ReaderViewModel, quizzViewModel: QuizzViewModel) {
                 quizzViewModel = quizzViewModel,
                 onFinish = { passed ->
                     showQuiz = false
-                    if (passed) {
-                        isRead = true
-                        scope.launch {
+                    scope.launch {
+                        if (passed) {
+                            isRead = true
                             snackbarHostState.showSnackbar(
-                                "Parabéns! Capítulo marcado como lido 🎉"
+                                message = "Parabéns! Capítulo marcado como lido 🎉"
                             )
-                        }
-                    } else {
-                        scope.launch {
+                        } else {
+                            snackbarColor = Color(0xFFF44336) // Vermelho
                             snackbarHostState.showSnackbar(
-                                "Você precisa acertar pelo menos 3 respostas!"
+                                message = "Você precisa acertar pelo menos 3 respostas!"
                             )
                         }
                     }
@@ -123,7 +124,7 @@ fun ReaderScreen(viewModel: ReaderViewModel, quizzViewModel: QuizzViewModel) {
         } else {
 
             Scaffold(
-                snackbarHost = { CustomSnackBar(snackbarHostState, textColor = Color.Black, null) }
+                snackbarHost = { CustomSnackBar(snackbarHostState, backgroundColor = snackbarColor, textColor = Color.White, null) }
             ){
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -229,19 +230,14 @@ fun ReaderScreen(viewModel: ReaderViewModel, quizzViewModel: QuizzViewModel) {
                             .padding(horizontal = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(0.dp)
                     ) {
-                        itemsIndexed(verses) { index, verse ->
+                        itemsIndexed(verses) { _, verse ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .background(
-                                        when {
-                                            verseHighlights.containsKey(verse.id) -> verseHighlights[verse.id]!!
-                                            selectedVerses.contains(verse) -> Color.LightGray.copy(
-                                                alpha = 0.3f
-                                            )
-
-                                            else -> Color.Transparent
-                                        }
+                                        verseHighlights[verse.id]?.copy(alpha = 0.3f)
+                                            ?: if (selectedVerses.contains(verse)) Color.LightGray.copy(alpha = 0.3f)
+                                            else Color.Transparent
                                     )
                                     .padding(vertical = 8.dp)
                                     .clickable {
@@ -359,22 +355,36 @@ fun ReaderScreen(viewModel: ReaderViewModel, quizzViewModel: QuizzViewModel) {
                             },
                             title = { Text("Marcar versículo") },
                             text = {
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-
-                                ) {
-                                    listOf(Color.Yellow, Color.Green, Color.Cyan, Color.Red, Color.Magenta, Color.LightGray).forEach { color ->
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    listOf(Color.Yellow.copy(0.5f), Color.Green.copy(0.5f), Color.Cyan.copy(0.5f), Color.Red.copy(0.5f), Color.Magenta.copy(0.5f)).forEach { color ->
                                         Box(
                                             modifier = Modifier
                                                 .size(30.dp)
                                                 .clip(CircleShape)
                                                 .background(color)
                                                 .clickable {
-                                                    verseHighlights = verseHighlights +
-                                                            selectedVerses.associate { it.id to color }
+                                                    highlightViewModel.markVerses(selectedVerses, color)
                                                     showMarkDialog = false
                                                     selectedVerses = emptyList()
                                                 }
+                                        )
+                                    }
+
+                                    Box(
+                                        modifier = Modifier
+                                            .size(30.dp)
+                                            .clip(CircleShape)
+                                            .background(Color.LightGray)
+                                            .clickable {
+                                                highlightViewModel.unmarkVerse(selectedVerses[0].id)
+                                                showMarkDialog = false
+                                            }
+                                    ){
+                                        Icon(
+                                            imageVector = Icons.Rounded.Close,
+                                            contentDescription = "Close",
+                                            tint = Color.Black,
+                                            modifier = Modifier.align(Alignment.Center)
                                         )
                                     }
                                 }

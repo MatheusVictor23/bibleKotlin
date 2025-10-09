@@ -36,10 +36,11 @@ fun SignUpScreen(
     val error by authViewModel.error.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
+    var snackbarColor by remember { mutableStateOf(Color(0xFF4CAF50)) }
     val scope = rememberCoroutineScope()
 
     Scaffold (
-        snackbarHost = { CustomSnackBar(snackbarHostState, textColor = Color.Red, icon = Icons.Filled.Info) }
+        snackbarHost = { CustomSnackBar(snackbarHostState, backgroundColor = snackbarColor, textColor = Color.White, icon = Icons.Filled.Info) }
     ){ innerPadding ->
 
         Column(
@@ -144,20 +145,31 @@ fun SignUpScreen(
                     Text("Cadastrar-se")
                 }
 
-                LaunchedEffect(emailSent) {
-                    if (emailSent) {
-                        snackbarHostState.showSnackbar("Verifique seu e-mail para confirmar o cadastro!")
+                LaunchedEffect(userSession, error) {
+
+                    when {
+                        userSession != null -> {
+                            snackbarColor = Color(0xFF4CAF50)
+                            scope.launch { snackbarHostState.showSnackbar(
+                                message = "Cadastro realizado com sucesso!",
+                                withDismissAction = true,
+                            ) }
+                            navController.navigate("login")
+                        }
+
+                        error != null -> {
+                            snackbarColor = Color(0xFFF44336)
+                            scope.launch { snackbarHostState.showSnackbar(
+                                message = "Erro ao cadastrar usuário. Tente novamente em alguns segundos, se o erro persistir, contate-nos: mrs.thebible.contact@gmail.com",
+                                withDismissAction = true,
+                            ) }
+
+                            authViewModel.resetError()
+                        }
                     }
+
                 }
 
-                    error?.let {
-                        scope.launch { snackbarHostState.showSnackbar(
-                            message = "Erro ao cadastrar usuário. Tente novamente em alguns segundo, se o erro persistir, contate-nos: mrs.thebible.contact@gmail.com",
-                            withDismissAction = true,
-                        ) }
-
-                        authViewModel.resetError()
-                    }
             }
         }
     }

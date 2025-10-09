@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CustomSnackBar(snackbarHostState: SnackbarHostState, textColor: Color, icon: ImageVector?) {
+fun CustomSnackBar(snackbarHostState: SnackbarHostState, backgroundColor: Color, textColor: Color, icon: ImageVector?) {
     SnackbarHost(
         hostState = snackbarHostState,
         snackbar = { data ->
@@ -29,7 +29,7 @@ fun CustomSnackBar(snackbarHostState: SnackbarHostState, textColor: Color, icon:
                     .padding(16.dp)
                     .shadow(elevation = 4.dp, shape = RoundedCornerShape(8.dp)),
                 shape = RoundedCornerShape(8.dp),
-                containerColor = Color.White,
+                containerColor = backgroundColor,
                 contentColor = textColor,
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -37,11 +37,15 @@ fun CustomSnackBar(snackbarHostState: SnackbarHostState, textColor: Color, icon:
                         Icon(
                             imageVector = icon,
                             contentDescription = "Erro",
-                            tint = Color.Red,
+                            tint = textColor,
                             modifier = Modifier.padding(end = 8.dp)
                         )
                     }
-                    Text(text = data.visuals.message)
+                    Text(
+                        text = data.visuals.message,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+                        color = textColor
+                    )
                 }
             }
         }

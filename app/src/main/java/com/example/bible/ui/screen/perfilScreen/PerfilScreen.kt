@@ -35,30 +35,38 @@ import com.composables.Crown
 import com.composables.Flame
 import com.example.bible.ui.components.icons.Target
 import com.example.bible.ui.screen.auth.AuthViewModel
+import io.github.jan.supabase.gotrue.user.UserSession
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.concurrent.timer
 
 
 @Composable
 fun PerfilScreen(
     authViewModel: AuthViewModel = viewModel(),
+    perfilViewModel: PerfilViewModel,
     navController: NavController,
 ) {
-
+    val scope = rememberCoroutineScope()
+    val user by perfilViewModel.user.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .background(MaterialTheme.colorScheme.background)
     ) {
-        UserProfileHeader()
+        UserProfileHeader(user?.email)
         StatsSection()
         AchievementsSection()
         LeaderSection()
         SettingsSection()
         Button(
             onClick = {
-                authViewModel.signOut()
-                navController.navigate("login")
+                scope.launch {
+                    authViewModel.signOut()
+                    delay(300)
+                    navController.navigate("login")
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -70,7 +78,7 @@ fun PerfilScreen(
 }
 
 @Composable
-fun UserProfileHeader() {
+fun UserProfileHeader(userEmail:String?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -91,7 +99,7 @@ fun UserProfileHeader() {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "silassalan@gmail.com",
+                    text = userEmail ?: "Usuário não encontrado",
                     color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.titleMedium
                 )

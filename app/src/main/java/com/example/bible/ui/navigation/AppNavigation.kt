@@ -27,7 +27,10 @@ import com.example.bible.ui.screen.readerScreen.ReaderScreen
 import com.example.bible.ui.screen.auth.AuthViewModel
 import com.example.bible.ui.screen.readerScreen.ReaderViewModel
 import com.example.bible.R
+import com.example.bible.ui.screen.favoriteScreen.FavoriteViewModel
+import com.example.bible.ui.screen.perfilScreen.PerfilViewModel
 import com.example.bible.ui.screen.quizzScreen.QuizzViewModel
+import com.example.bible.ui.screen.readerScreen.VerseHighlightViewModel
 import io.github.jan.supabase.gotrue.user.UserSession
 
 
@@ -124,7 +127,7 @@ val missions = listOf(
 
 
 @Composable
-fun AppNavigation(readerViewModel: ReaderViewModel, authViewModel: AuthViewModel, quizzViewModel: QuizzViewModel, userSession: UserSession?) {
+fun AppNavigation(readerViewModel: ReaderViewModel, authViewModel: AuthViewModel, perfilViewModel: PerfilViewModel, quizzViewModel: QuizzViewModel, userSession: UserSession?, verseHighlightViewModel: VerseHighlightViewModel, favoriteViewModel: FavoriteViewModel) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -146,7 +149,7 @@ fun AppNavigation(readerViewModel: ReaderViewModel, authViewModel: AuthViewModel
                 streak = 5,
                 navController = navController
             ) }
-            composable(Screen.Reader.route) { ReaderScreen(readerViewModel, quizzViewModel) }
+            composable(Screen.Reader.route) { ReaderScreen(readerViewModel, quizzViewModel, verseHighlightViewModel) }
 
             composable(Screen.Missions.route) { MissionsScreen (
                 missions,
@@ -159,17 +162,11 @@ fun AppNavigation(readerViewModel: ReaderViewModel, authViewModel: AuthViewModel
                 streak = 5,)
             }
             composable(Screen.Perfil.route){
-                PerfilScreen(authViewModel, navController)
+                PerfilScreen(authViewModel, perfilViewModel, navController)
             }
 
             composable (Screen.Favorites.route){
-                FavoritesScreen(
-                    username = "Leitor",
-                    level = 3,
-                    progressPercentage = 0.65f,
-                    pointsToNextLevel = 120,
-                    totalPoints = 1520,
-                    streak = 5,)
+                FavoritesScreen(favoriteViewModel)
             }
 
             composable(Screen.Login.route){

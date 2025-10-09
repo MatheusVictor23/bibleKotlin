@@ -28,9 +28,9 @@ class UserRepository {
         }
     }
 
-    suspend fun getUser(userId: String): User? {
+    suspend fun getUser(email: String): User? {
         return client.from("User").select {
-            filter { eq("id", userId) }
+            filter { eq("email", email) }
         }.decodeSingleOrNull()
     }
 
