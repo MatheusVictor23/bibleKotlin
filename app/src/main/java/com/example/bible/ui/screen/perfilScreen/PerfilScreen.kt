@@ -23,31 +23,62 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.composables.BookPlus
 import com.composables.Crown
 import com.composables.Flame
 import com.example.bible.ui.components.icons.Target
+import com.example.bible.ui.screen.auth.AuthViewModel
+import io.github.jan.supabase.gotrue.user.UserSession
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.concurrent.timer
 
 
 @Composable
-fun PerfilScreen() {
+fun PerfilScreen(
+    authViewModel: AuthViewModel = viewModel(),
+    perfilViewModel: PerfilViewModel,
+    navController: NavController,
+) {
+    val scope = rememberCoroutineScope()
+    val user by perfilViewModel.user.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .background(MaterialTheme.colorScheme.background)
     ) {
-        UserProfileHeader()
+        UserProfileHeader(user?.email)
         StatsSection()
         AchievementsSection()
         LeaderSection()
         SettingsSection()
+        Button(
+            onClick = {
+                scope.launch {
+                    authViewModel.signOut()
+                    delay(300)
+                    navController.navigate("login")
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text("Logout")
+        }
     }
 }
 
 @Composable
-fun UserProfileHeader() {
+fun UserProfileHeader(userEmail:String?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -68,7 +99,7 @@ fun UserProfileHeader() {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "silassalan@gmail.com",
+                    text = userEmail ?: "Usuário não encontrado",
                     color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.titleMedium
                 )
@@ -230,8 +261,7 @@ fun AchievementItem(icon: ImageVector, title: String, description: String) {
 fun LeaderSection() {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(16.dp),
         elevation = CardDefaults.cardElevation(1.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -274,8 +304,7 @@ fun LeaderSection() {
 fun SettingsSection() {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(16.dp),
         elevation = CardDefaults.cardElevation(1.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

@@ -1,11 +1,13 @@
 package com.example.bible.ui.screen.readerScreen
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bible.data.local.entity.BookEntity
 import com.example.bible.data.local.entity.ChapterEntity
 import com.example.bible.data.local.entity.VerseEntity
 import com.example.bible.data.local.repository.BibleRepository
+import com.example.bible.data.local.repository.VerseHighlightRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -98,5 +100,12 @@ class ReaderViewModel(private val repository: BibleRepository): ViewModel() {
             setChapter(currentChapters[currentIndex - 1])
         }
     }
+
+    fun markAsRead(chapterId: Int?) {
+        viewModelScope.launch {
+            repository.markChapterAsRead(chapterId)
+        }
+    }
+
 
 }

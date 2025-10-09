@@ -2,22 +2,23 @@ package com.example.bible.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "chapters",
+    tableName = "verse_highlights",
     foreignKeys = [
         ForeignKey(
-            entity = BookEntity::class,
+            entity = VerseEntity::class,
             parentColumns = ["id"],
-            childColumns = ["bookId"],
+            childColumns = ["verseId"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index("verseId", unique = true)]
 )
-data class ChapterEntity(
+data class VerseHighlightEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val bookId: Int,
-    val number: Int,
-    val isRead: Boolean = false
+    val verseId: Int,
+    val color: String // ex: "#FFEB3B"
 )

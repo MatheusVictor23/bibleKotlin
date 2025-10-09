@@ -43,4 +43,7 @@ interface BibleDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveLastChapter(lecture: LastChapterEntity)
+
+    @Query("UPDATE chapters SET isRead = 1 WHERE id = :chapterId")
+    suspend fun markChapterAsRead(chapterId: Int?)
 }
